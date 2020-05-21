@@ -199,7 +199,7 @@ public class GameActivity extends AppCompatActivity {
                     public boolean apply(Map.Entry<Integer, List<Point>> entry) {
                         List<Point> points = entry.getValue();
                         List<Point> prev = highlights != null ? highlights.get(entry.getKey()) : null;
-                        if(prev!=null && prev.get(0).equals(points.get(0))) return false;
+                        if (prev != null && prev.get(0).equals(points.get(0))) return false;
                         int color = getColor(entry.getKey());
                         for (Point p : points) {
                             state.game.get(p).color = color;
@@ -208,11 +208,14 @@ public class GameActivity extends AppCompatActivity {
                     }
                 });
                 highlights = state.highlights;
-                grid.update(state.game);
-                if (state.game.getLost())
+                Point losingPoint = state.game.getLosingPoint();
+                if (state.game.getLost() && losingPoint != null) {
+                    state.game.get(losingPoint).lost = true;
                     Toast.makeText(GameActivity.this, "Lost", Toast.LENGTH_SHORT).show();
+                }
                 if (state.game.getWon())
                     Toast.makeText(GameActivity.this, "Won", Toast.LENGTH_SHORT).show();
+                grid.update(state.game);
             }
         });
     }

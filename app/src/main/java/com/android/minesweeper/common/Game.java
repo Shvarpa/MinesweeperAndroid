@@ -48,7 +48,7 @@ public class Game {
         if (cell.isRevealed()) return false;
         if (cell.isBomb()) {
             revealAll();
-            state.lost = true;
+            state.lost = cell.asPoint();
             return true;
         }
         cell.reveal();

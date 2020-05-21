@@ -16,6 +16,7 @@ public class Cell extends Point {
     Integer number = null;
 
     public transient Integer color;
+    public transient Boolean lost;
 
     Cell(int x, int y) {
         super(x, y);

@@ -22,7 +22,7 @@ public class GameState {
     @SerializedName("won")
     Boolean won = null;
     @SerializedName("lost")
-    Boolean lost = null;
+    Point lost = null;
     @SerializedName("bombs")
     Integer bombs = null;
     @SerializedName("flags")
@@ -106,8 +106,12 @@ public class GameState {
         return rows;
     }
 
-    public Boolean getLost() {
-        return lost != null && lost;
+    public boolean getLost() {
+        return lost != null;
+    }
+
+    public Point getLosingPoint() {
+        return lost;
     }
 
     public boolean getWon() {

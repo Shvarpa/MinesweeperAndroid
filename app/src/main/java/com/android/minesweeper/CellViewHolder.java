@@ -30,6 +30,7 @@ public class CellViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     private Cell cell;
     private Button item;
     private View mView;
+    private Resources resources;
     private int defualtColor;
     private int[] colors;
     private Listener<Cell> onClick, onLongClick;
@@ -50,8 +51,9 @@ public class CellViewHolder extends RecyclerView.ViewHolder implements View.OnCl
 
     private void assignView(View itemView) {
         mView = itemView;
+        resources = mView.getResources();
         item = itemView.findViewById(R.id.cell_number);
-        colors = mView.getResources().getIntArray(R.array.number_colors);
+        colors = resources.getIntArray(R.array.number_colors);
         defualtColor = getColorFromAttr(R.attr.colorPrimary);
     }
 
@@ -78,14 +80,15 @@ public class CellViewHolder extends RecyclerView.ViewHolder implements View.OnCl
                 drawText(cell.getNumber() == 0 ? "" : cell.getNumber().toString());
 //                item.setText(cell.getNumber() == 0 ? "" : cell.getNumber().toString());
             } else {
-                drawText("B");
+                if(cell.lost != null && cell.lost) drawText(resources.getString(R.string.boom));
+                else drawText(resources.getString(R.string.bomb));
 //                item.setText("B");
             }
         } else {
             background = getColorFromAttr(R.attr.backgroundColor);
             scale = 0.5f;
             if (cell.isFlag()) {
-                drawText("F");
+                drawText(resources.getString(R.string.flag));
 //                item.setText("F");
             } else {
                 drawText("");
@@ -100,7 +103,7 @@ public class CellViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     }
 
     private void drawText(String text) {
-        OutlineSpan outlineSpan = new OutlineSpan(mView.getResources().getColor(R.color.white), 2f);
+        OutlineSpan outlineSpan = new OutlineSpan(resources.getColor(R.color.white), 2f);
         SpannableString spannable = new SpannableString(text);
         spannable.setSpan(outlineSpan, 0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         item.setText(spannable, TextView.BufferType.SPANNABLE);
