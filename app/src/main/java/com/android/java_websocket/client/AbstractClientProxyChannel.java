@@ -5,7 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 
-import com.android.tpvision.java_websocket.AbstractWrappedByteChannel;
+import com.android.java_websocket.AbstractWrappedByteChannel;
 
 public abstract class AbstractClientProxyChannel extends AbstractWrappedByteChannel {
 	protected final ByteBuffer proxyHandshake;

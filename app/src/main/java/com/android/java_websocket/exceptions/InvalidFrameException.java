@@ -1,6 +1,6 @@
 package com.android.java_websocket.exceptions;
 
-import com.android.tpvision.java_websocket.framing.CloseFrame;
+import com.android.java_websocket.framing.CloseFrame;
 
 public class InvalidFrameException extends InvalidDataException {
 

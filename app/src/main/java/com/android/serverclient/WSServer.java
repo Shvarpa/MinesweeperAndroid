@@ -1,21 +1,19 @@
 package com.android.serverclient;
 
-import androidx.annotation.Nullable;
+import android.net.nsd.NsdServiceInfo;
 
 import com.android.java_websocket.WebSocket;
 import com.android.java_websocket.drafts.Draft;
 import com.android.java_websocket.server.WebSocketServer;
+import com.android.serverclient.interfaces.Service;
 
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.List;
 
-interface Service {
-    @Nullable String getServiceName();
-}
-
 public abstract class WSServer extends WebSocketServer implements Service {
+
     public WSServer() throws UnknownHostException {
     }
 

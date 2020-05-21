@@ -1,6 +1,7 @@
 package com.android.serverclient;
 
 import android.net.nsd.NsdServiceInfo;
+import android.util.Log;
 
 import androidx.recyclerview.widget.DiffUtil;
 
@@ -14,7 +15,9 @@ public class ServiceListDiff extends DiffUtil.Callback {
     public ServiceListDiff(List<NsdServiceInfo> oldList, List<NsdServiceInfo> newList) {
         this.oldList = oldList;
         this.newList = newList;
+        Log.d("TAG", "ServiceListDiff: \n" + oldList + "\n" + newList);
     }
+
     @Override
     public int getOldListSize() {
         return oldList.size();

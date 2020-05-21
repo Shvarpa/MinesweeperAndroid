@@ -1,5 +1,6 @@
 package com.android.serverclient;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -10,16 +11,22 @@ import androidx.annotation.Nullable;
 import com.android.java_websocket.WebSocket;
 import com.android.java_websocket.WebSocketImpl;
 import com.android.java_websocket.server.WebSocketServer;
+import com.android.minesweeper.interfaces.Listener;
 
-public class Server extends AsyncTask<String, Void, String> {
+public class ServerTask extends AsyncTask<String, Void, String> {
 
     private static final String TAG = "Server";
     private WSServer mServer;
     private NsdHelper mNsdHelper;
+    private Listener<Object> onStart;
 
-    public Server(Context ctx, WSServer server) {
-        mNsdHelper = new NsdHelper(ctx, server.getServiceName(), null);
+    public ServerTask(Activity activity, WSServer server) {
+        mNsdHelper = new NsdHelper(activity);
         mServer = server;
+    }
+
+    public void setOnStart(Listener<Object> onStart) {
+        this.onStart = onStart;
     }
 
     public void start() {
@@ -29,15 +36,15 @@ public class Server extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... strings) {
         WebSocketImpl.DEBUG = true;
-        int port = 8887; // 843 flash policy port
         mServer.start();
-        Log.i(TAG, "ChatServer started on port: " + mServer.getPort());
+        Log.i(TAG, "Server started on port: " + mServer.getPort());
         return null;
     }
 
     @Override
     protected void onPostExecute(String result) {
         AdvertiseServer();
+        onStart.on(null);
     }
 
 

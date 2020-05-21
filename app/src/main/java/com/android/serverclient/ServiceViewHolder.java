@@ -1,7 +1,7 @@
 package com.android.serverclient;
 
 import com.android.R;
-import com.android.minesweeper.Listener;
+import com.android.minesweeper.interfaces.Listener;
 
 import android.net.nsd.NsdServiceInfo;
 import android.view.View;
@@ -45,7 +45,7 @@ public class ServiceViewHolder extends RecyclerView.ViewHolder {
 
     public void setService(NsdServiceInfo service) {
         this.service = service;
-        name.setText(service.getServiceName());
+        name.setText(service.getServiceName() + ", at " + service.getHost());
     }
 
     public NsdServiceInfo getService() {

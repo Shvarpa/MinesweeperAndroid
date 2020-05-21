@@ -1,7 +1,8 @@
 package com.android.serverclient;
 
-import android.content.Context;
+import android.app.Activity;
 import android.net.nsd.NsdServiceInfo;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -12,29 +13,27 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.R;
-import com.android.minesweeper.Listener;
+import com.android.minesweeper.interfaces.Listener;
+import com.android.serverclient.interfaces.Container;
 
+import java.util.ArrayList;
 import java.util.List;
-
-interface Container<DataType> {
-    void update(List<DataType> updated);
-}
 
 public class ServiceList extends RecyclerView.Adapter<ServiceViewHolder> implements Container<NsdServiceInfo> {
 
-    Context mContext;
+    Activity mActivity;
     RecyclerView mView;
     RecyclerView.LayoutManager mLayout;
     private NsdHelper mHelper;
 
-    List<NsdServiceInfo> list;
+    List<NsdServiceInfo> list = new ArrayList<>();
     Listener<NsdServiceInfo> onJoin;
 
-    public ServiceList(Context context, RecyclerView view, @Nullable Listener<NsdServiceInfo> onJoin) {
-        mContext = context;
-        mHelper = new NsdHelper(mContext, null, null);
+    public ServiceList(Activity activity, RecyclerView view, @Nullable Listener<NsdServiceInfo> onJoin) {
+        mActivity = activity;
+        mHelper = new NsdHelper(mActivity);
         mView = view;
-        mLayout = new LinearLayoutManager(mContext);
+        mLayout = new LinearLayoutManager(mActivity);
         mView.setAdapter(this);
         mView.setLayoutManager(mLayout);
         this.onJoin = onJoin;
@@ -56,11 +55,27 @@ public class ServiceList extends RecyclerView.Adapter<ServiceViewHolder> impleme
         return list.size();
     }
 
+    public void start(String name) {
+        mHelper.startDiscovery(name, this);
+    }
+
+    public void stop() {
+//        list.clear();
+//        notifyDataSetChanged();
+        mHelper.stopDiscovery();
+    }
 
     @Override
-    public void update(List<NsdServiceInfo> updated) {
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new ServiceListDiff(updated, this.list));
-        this.list = updated;
-        diffResult.dispatchUpdatesTo(this);
+    public void update(final List<NsdServiceInfo> updated) {
+        Log.e("TAG", "update: " + updated);
+//        final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new ServiceListDiff(updated, ServiceList.this.list));
+//        diffResult.dispatchUpdatesTo(ServiceList.this);
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ServiceList.this.list = updated;
+                notifyDataSetChanged();
+            }
+        });
     }
 }

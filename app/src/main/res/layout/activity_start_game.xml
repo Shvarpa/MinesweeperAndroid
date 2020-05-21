@@ -2,11 +2,36 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:gravity="center_horizontal"
-    >
+    android:orientation="vertical">
 
     <TextView
         style="@style/Title"
         android:text="Start Game" />
+
+    <LinearLayout style="@style/Column">
+
+        <LinearLayout style="@style/Row">
+
+            <TextView
+                style="@style/Text"
+                android:text="Difficulty"
+                />
+
+            <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/difficulty_spinner"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnStart"
+        style="@style/Button"
+        android:text="Start" />
+
+    <TextView
+        android:id="@+id/status"
+        style="@style/Text" />
 </LinearLayout>

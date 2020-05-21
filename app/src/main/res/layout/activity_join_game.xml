@@ -2,11 +2,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
     android:gravity="center_horizontal"
-    >
+    android:orientation="vertical"
+    tools:context=".minesweeper.JoinGameActivity">
 
     <TextView
         style="@style/Title"
         android:text="Join Game" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/service_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical" />
+
+    <Button
+        android:id="@+id/btnRefresh"
+        style="@style/Button"
+        android:text="Refresh" />
+
 </LinearLayout>

@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Minesweeper</string>
+    <string name="bombs">Bombs:</string>
+    <string name="remaining">Remaining:</string>
+    <string name="bombs_remaining">Bombs Remaining:</string>
+    <string-array name="difficulties">
+        <item>Easy</item>
+        <item>Medium</item>
+        <item>Hard</item>
+    </string-array>
 </resources>
