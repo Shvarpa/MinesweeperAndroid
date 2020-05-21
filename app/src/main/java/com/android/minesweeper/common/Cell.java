@@ -1,5 +1,7 @@
 package com.android.minesweeper.common;
 
+import android.graphics.Color;
+
 import com.google.gson.annotations.SerializedName;
 
 public class Cell extends Point {
@@ -12,6 +14,8 @@ public class Cell extends Point {
     transient Integer hiddenNumber = 0;
     @SerializedName("number")
     Integer number = null;
+
+    public transient Integer color;
 
     Cell(int x, int y) {
         super(x, y);
@@ -35,6 +39,18 @@ public class Cell extends Point {
         return number;
     }
 
+    public int getNumberValue() {
+        return number == null ? -1 : number;
+    }
+
+    public Integer getColor() {
+        return color;
+    }
+
+    public int getColorValue() {
+        return color == null ? -1 : color;
+    }
+
     public boolean isFlag() {
         return flag;
     }
@@ -47,24 +63,18 @@ public class Cell extends Point {
         return new Point(x, y);
     }
 
-    @Override
-    public String toString() {
-        return "cell{ x: " + x + ", y: " + y + ", revealed: " + revealed + ", bomb: " + isBomb() + (getNumber() != null ? ", number: " + getNumber() : "") + " }";
+    public boolean equals(Cell other) {
+        return x == other.x && y == other.y &&
+                isRevealed() == other.isRevealed() && isFlag() == other.isFlag() &&
+                getNumberValue() == other.getNumberValue() && getColorValue() == other.getColorValue();
     }
 
-//    public char toByte() {
-//        char b = 0;
-//        if (revealed) b |= 0x80;
-//        if (revealed && bomb) b |= 0x40;
-//        if (flag) b |= 0x20;
-//        if (number != null) b |= (number & 0x1f);
-//        return b;
-//    }
-//
-//    public void fromByte(char b) {
-//        revealed = ((b & 0x80) != 0);
-//        bomb = ((b & 0x40) != 0);
-//        flag = ((b & 0x20) != 0);
-//        number = (b & 0x1f);
-//    }
+    public boolean same(Cell other) {
+        return x == other.x && y == other.y;
+    }
+
+    @Override
+    public String toString() {
+        return "cell{ x: " + x + ", y: " + y + ", revealed: " + revealed + ", bomb: " + isBomb() + (number != null ? ", number: " + getNumber() : "") + " }";
+    }
 }

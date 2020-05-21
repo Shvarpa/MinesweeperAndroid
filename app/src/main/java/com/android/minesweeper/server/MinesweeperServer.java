@@ -1,10 +1,10 @@
 package com.android.minesweeper.server;
 
-import android.app.Activity;
-import android.util.Log;
+import androidx.annotation.NonNull;
 
 import com.android.java_websocket.WebSocket;
 import com.android.java_websocket.handshake.ClientHandshake;
+import com.android.minesweeper.CollectionUtils;
 import com.android.minesweeper.common.ClientMessage;
 import com.android.minesweeper.common.Game;
 import com.android.minesweeper.common.GameState;
@@ -15,9 +15,12 @@ import com.android.serverclient.WSServer;
 import com.google.gson.Gson;
 
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class MinesweeperServer extends WSServer {
 
@@ -26,16 +29,17 @@ public class MinesweeperServer extends WSServer {
     private Gson gson = new Gson();
     private Game game = new Game();
 
+    private WebSocketDns dns = new WebSocketDns();
+    private HashMap<Integer, List<Point>> highlights = new HashMap<>();
+
+
     @Override
     public String getServiceName() {
         return serviceName;
     }
 
-    private Activity activity;
-
-    public MinesweeperServer(int port, Activity activity) {
+    public MinesweeperServer(int port) {
         super(new InetSocketAddress(port));
-        this.activity = activity;
     }
 
 
@@ -48,13 +52,15 @@ public class MinesweeperServer extends WSServer {
 //                Toast.makeText(activity, conn.getRemoteSocketAddress().getAddress().getHostAddress() + " connected to server", Toast.LENGTH_SHORT).show();
 //            }
 //        });
+        dns.onConnect.on(conn);
         synchronized (conn) {
-            conn.send(gson.toJson(new ClientMessage(game.getState())));
+            update(conn);
         }
     }
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
+        dns.onLeave.on(conn);
         this.sendToAll(conn + " has left the room!");
 //        Log.i(TAG, conn + " has left the room!");
     }
@@ -64,10 +70,11 @@ public class MinesweeperServer extends WSServer {
 //        Log.e(TAG, conn + ": " + message);
         if (message == null) return;
         ServerMessage msg = gson.fromJson(message, ServerMessage.class);
+        Integer target = dns.find(conn);
         if (msg.init != null) this.init(msg.init);
-        if (msg.reveal != null) this.reveal(msg.reveal);
-        if (msg.flag != null) this.flag(msg.flag);
-        if (msg.neighbours != null) this.neighbours(msg.neighbours);
+        if (msg.reveal != null) this.reveal(target, msg.reveal);
+        if (msg.flag != null) this.flag(target, msg.flag);
+        if (msg.neighbours != null) this.neighbours(target, msg.neighbours);
 //        activity.runOnUiThread(new Runnable() {
 //            public void run() {
 //                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
@@ -80,26 +87,44 @@ public class MinesweeperServer extends WSServer {
         update();
     }
 
-    private void reveal(Point p) {
-        if(this.game.reveal(p)) update();
+    private void reveal(Integer conn, Point p) {
+        if (this.game.reveal(p)) {
+            List<Point> list = new ArrayList<>();
+            list.add(p);
+            highlights.put(conn, list);
+            update();
+        }
     }
 
-    private void flag(Point p) {
-        if(this.game.flag(p)) update();
+    private void flag(Integer conn, Point p) {
+        if (this.game.flag(p)) {
+            List<Point> list = new ArrayList<>();
+            list.add(p);
+            highlights.put(conn, list);
+            update();
+        }
     }
 
-    private void neighbours(Point p) {
-        if (this.game.revealNeighbours(p)) update();
+    private void neighbours(Integer conn, Point p) {
+        if (this.game.revealNeighbours(p)) {
+            List<Point> list = this.game.getState().getNeighbouringPoints(p);
+            list.add(p);
+            highlights.put(conn, list);
+            update();
+        }
+    }
+
+    private void update(final WebSocket conn) {
+        conn.send(gson.toJson(new ClientMessage(game.getState(), highlights)));
     }
 
     private void update() {
-        String message = gson.toJson(new ClientMessage(game.getState()));
-//        byte[] message = new ClientMessage(game.getState())
 //        ByteBuffer message = ByteBuffer.wrap(ClientMessage.charArrayToByteArray(game.getState().toBytes()));
 //        Log.e(TAG, "update: " + message);
         Collection<WebSocket> con = this.connections();
+        String message = gson.toJson(new ClientMessage(game.getState(), highlights));
         synchronized (con) {
-            for (WebSocket c : con)
+            for (final WebSocket c : con)
                 c.send(message);
         }
     }

@@ -1,6 +1,12 @@
 package com.android.minesweeper;
 
+import android.animation.Animator;
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.content.res.Resources;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
@@ -9,8 +15,10 @@ import android.widget.TextView;
 import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.core.graphics.ColorUtils;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.OutlineSpan;
 import com.android.R;
 import com.android.minesweeper.common.Cell;
 import com.android.minesweeper.interfaces.Listener;
@@ -20,8 +28,10 @@ import java.util.Locale;
 public class CellViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
     private Cell cell;
-    private Button tvNumber;
+    private Button item;
     private View mView;
+    private int defualtColor;
+    private int[] colors;
     private Listener<Cell> onClick, onLongClick;
 
     public CellViewHolder(@NonNull View itemView) {
@@ -34,13 +44,15 @@ public class CellViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         assignView(itemView);
         this.onClick = onClick;
         this.onLongClick = onLongClick;
-        tvNumber.setOnClickListener(this);
-        tvNumber.setOnLongClickListener(this);
+        item.setOnClickListener(this);
+        item.setOnLongClickListener(this);
     }
 
     private void assignView(View itemView) {
         mView = itemView;
-        tvNumber = itemView.findViewById(R.id.cell_number);
+        item = itemView.findViewById(R.id.cell_number);
+        colors = mView.getResources().getIntArray(R.array.number_colors);
+        defualtColor = getColorFromAttr(R.attr.colorPrimary);
     }
 
     private @ColorInt
@@ -50,23 +62,61 @@ public class CellViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         return typedValue.data;
     }
 
+    private int colorFromNumber(Integer number) {
+        return number != null && number > 0 ? colors[number - 1] : defualtColor;
+    }
+
     public void setCell(Cell cell) {
         this.cell = cell;
+        int background;
+        float scale;
+        item.setTextColor(colorFromNumber(cell.getNumber()));
         if (cell.isRevealed()) {
-            tvNumber.setBackgroundColor(getColorFromAttr(R.attr.colorBackgroundFloating));
-            if (cell.getNumber() != null)
-                tvNumber.setText(cell.getNumber() == 0 ? "" : cell.getNumber().toString());
-            else
-                tvNumber.setText("B");
-        } else {
-            tvNumber.setBackgroundColor(getColorFromAttr(R.attr.backgroundColor));
-            if (cell.isFlag()) {
-                tvNumber.setText("F");
+            background = getColorFromAttr(R.attr.colorBackgroundFloating);
+            scale = 0.8f;
+            if (cell.getNumber() != null) {
+                drawText(cell.getNumber() == 0 ? "" : cell.getNumber().toString());
+//                item.setText(cell.getNumber() == 0 ? "" : cell.getNumber().toString());
             } else {
-                tvNumber.setText("");
-//            tvNumber.setVisibility(TextView.INVISIBLE);
+                drawText("B");
+//                item.setText("B");
+            }
+        } else {
+            background = getColorFromAttr(R.attr.backgroundColor);
+            scale = 0.5f;
+            if (cell.isFlag()) {
+                drawText("F");
+//                item.setText("F");
+            } else {
+                drawText("");
+//                item.setText("");
             }
         }
+        if (cell.getColor() != null) {
+            animateColorChange(background, ColorUtils.blendARGB(cell.getColor(), background, scale));
+        } else {
+            item.setBackgroundColor(background);
+        }
+    }
+
+    private void drawText(String text) {
+        OutlineSpan outlineSpan = new OutlineSpan(mView.getResources().getColor(R.color.white), 2f);
+        SpannableString spannable = new SpannableString(text);
+        spannable.setSpan(outlineSpan, 0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        item.setText(spannable, TextView.BufferType.SPANNABLE);
+    }
+
+    private void animateColorChange(int base, int color) {
+        final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), color, base);
+        colorAnimation.setDuration(500); // milliseconds
+        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                item.setBackgroundColor((int) animator.getAnimatedValue());
+            }
+        });
+        colorAnimation.start();
+        cell.color = null;
     }
 
     public Cell getCell() {

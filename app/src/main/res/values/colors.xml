@@ -4,4 +4,25 @@
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="revealed">#f0f0f0</color>
+
+    <array name="number_colors">
+        <item>@color/one</item>
+        <item>@color/two</item>
+        <item>@color/three</item>
+        <item>@color/four</item>
+        <item>@color/five</item>
+        <item>@color/six</item>
+        <item>@color/seven</item>
+        <item>@color/eight</item>
+    </array>
+
+    <color name="one">#0000ff</color>
+    <color name="two">#008000</color>
+    <color name="three">#ff0000</color>
+    <color name="four">#00008B</color>
+    <color name="five">#800000</color>
+    <color name="six">#26867c</color>
+    <color name="seven">#000000</color>
+    <color name="eight">#808080</color>
+    <color name="white">#ffffff</color>
 </resources>

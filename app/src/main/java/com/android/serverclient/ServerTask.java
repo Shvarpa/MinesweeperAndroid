@@ -3,22 +3,25 @@ package com.android.serverclient;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.android.java_websocket.WebSocket;
 import com.android.java_websocket.WebSocketImpl;
 import com.android.java_websocket.server.WebSocketServer;
 import com.android.minesweeper.interfaces.Listener;
 
-public class ServerTask extends AsyncTask<String, Void, String> {
+public class ServerTask extends AsyncTask<String,Void,String> {
 
     private static final String TAG = "Server";
     private WSServer mServer;
     private NsdHelper mNsdHelper;
     private Listener<Object> onStart;
+    private AsyncTask<String, Void, String> mTask;
 
     public ServerTask(Activity activity, WSServer server) {
         mNsdHelper = new NsdHelper(activity);
@@ -47,6 +50,10 @@ public class ServerTask extends AsyncTask<String, Void, String> {
         onStart.on(null);
     }
 
+
+    public WSServer getServer() {
+        return mServer;
+    }
 
     //Discovery Related code - start
     public void AdvertiseServer() {

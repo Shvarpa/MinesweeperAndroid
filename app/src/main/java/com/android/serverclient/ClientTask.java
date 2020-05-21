@@ -17,7 +17,12 @@ public class ClientTask extends AsyncTask<String, Void, String> {
     private static final String TAG = "Client";
     private WebSocketClient mClient;
     private ClientCreator creator;
-    private URI url;
+    private URI uri;
+
+    public ClientTask(ClientCreator creator, String url) {
+        this.creator = creator;
+        if (url != null) setUri(url);
+    }
 
     public ClientTask(ClientCreator creator) {
         this.creator = creator;
@@ -25,14 +30,17 @@ public class ClientTask extends AsyncTask<String, Void, String> {
 
     public void connect(String url) {
         if (mClient != null) mClient.close();
-        try {
-            this.url = new URI(url);
-        } catch (Exception e) {
-            Log.e(TAG, "URI Parsing Failed, client cant join " + url);
-        }
+        setUri(url);
         execute();
     }
 
+    public void setUri(String url) {
+        try {
+            this.uri = new URI(url);
+        } catch (Exception e) {
+            Log.e(TAG, "URI Parsing Failed, client cant join " + url);
+        }
+    }
 
     private Listener<Object> onStart;
 
@@ -40,9 +48,14 @@ public class ClientTask extends AsyncTask<String, Void, String> {
         this.onStart = onStart;
     }
 
+    public WebSocketClient getClient() {
+        return mClient;
+    }
+
     @Override
     protected String doInBackground(String... strings) {
-        mClient = creator.connect(url);
+        if (uri == null) return null;
+        mClient = creator.connect(uri);
         mClient.connect();
         if (onStart != null) onStart.on(null);
         return null;

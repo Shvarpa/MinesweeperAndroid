@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -41,11 +42,11 @@ public class GameGrid extends RecyclerView.Adapter<CellViewHolder> {
         return new CellViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.view_cell, parent, false), onClick, onLongClick);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull CellViewHolder holder, int position) {
-        Point p = new Point(position % state.getColumns(), (int) (position / state.getColumns()));
 //        Log.e("TAG", "onBindViewHolder: " + "grid:(" + state.getColumns() + "," + state.getRows() + ") position:" + position + " (" + p.x + "," + p.y + ")");
-        holder.setCell(state.get(p));
+        holder.setCell(state.get(position));
     }
 
     @Override
@@ -64,8 +65,10 @@ public class GameGrid extends RecyclerView.Adapter<CellViewHolder> {
     void update(GameState state) {
         Log.e("TAG", "update: " + (state != null ? state.getGrid() : null));
         updateGrid(state, this.state);
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new GameGridDiff(state, this.state));
         this.state = state;
-        this.notifyDataSetChanged();
+        diffResult.dispatchUpdatesTo(this);
+//        this.notifyDataSetChanged();
     }
 
     public GameState getState() {

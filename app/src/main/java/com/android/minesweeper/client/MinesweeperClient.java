@@ -1,15 +1,10 @@
 package com.android.minesweeper.client;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.java_websocket.client.WebSocketClient;
-import com.android.java_websocket.drafts.Draft;
-import com.android.java_websocket.framing.Framedata;
 import com.android.java_websocket.handshake.ServerHandshake;
-import com.android.minesweeper.common.Cell;
 import com.android.minesweeper.common.ClientMessage;
-import com.android.minesweeper.common.Game;
 import com.android.minesweeper.common.GameActionValidator;
 import com.android.minesweeper.common.GameState;
 import com.android.minesweeper.common.InitRequest;
@@ -19,14 +14,15 @@ import com.android.minesweeper.interfaces.Listener;
 import com.google.gson.Gson;
 
 import java.net.URI;
-import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.Map;
 
 public class MinesweeperClient extends WebSocketClient {
 
     public static final String TAG = "MinesweeperClient";
     private Gson gson = new Gson();
 
-    private GameState state;
+    private ClientMessage state;
     private boolean open;
 
     public MinesweeperClient(URI serverURI) {
@@ -52,7 +48,7 @@ public class MinesweeperClient extends WebSocketClient {
 //        Log.e(TAG, "received string: " + message);
         if (message == null) return;
         ClientMessage msg = gson.fromJson(message, ClientMessage.class);
-        if (msg.update != null) update(msg.update);
+        if (msg != null) update(msg);
     }
 
 //    @Override
@@ -63,21 +59,21 @@ public class MinesweeperClient extends WebSocketClient {
 //    }
 
     public boolean reveal(Point p) {
-        boolean success = GameActionValidator.reveal(state, p);
+        boolean success = GameActionValidator.reveal(state.game, p);
         if (success && open) send(gson.toJson(new ServerMessage(null, p, null, null)));
 //        Log.e(TAG, "reveal: " + p + ", " + (success && open));
         return success && open;
     }
 
     public boolean flag(Point p) {
-        boolean success = GameActionValidator.flag(state, p);
+        boolean success = GameActionValidator.flag(state.game, p);
         if (success && open) send(gson.toJson(new ServerMessage(null, null, p, null)));
 //        Log.e(TAG, "flag: " + p + ", " + (success && open));
         return success && open;
     }
 
     public boolean neighbours(Point p) {
-        boolean success = GameActionValidator.neighbours(state, p);
+        boolean success = GameActionValidator.neighbours(state.game, p);
         if (success && open) send(gson.toJson(new ServerMessage(null, null, null, p)));
 //        Log.e(TAG, "reveal: " + p + ", " + (success && open));
         return success && open;
@@ -90,13 +86,13 @@ public class MinesweeperClient extends WebSocketClient {
         return open;
     }
 
-    private Listener<GameState> onUpdate;
+    private Listener<ClientMessage> onUpdate;
 
-    public void setOnUpdate(Listener<GameState> onUpdate) {
+    public void setOnUpdate(Listener<ClientMessage> onUpdate) {
         this.onUpdate = onUpdate;
     }
 
-    private void update(GameState state) {
+    private void update(ClientMessage state) {
         try {
 //            this.state = GameState.fromBytes(ClientMessage.byteArrayToCharArray(state));
             this.state = state;
@@ -113,7 +109,7 @@ public class MinesweeperClient extends WebSocketClient {
     }
 
     private void message(String message) {
-        if(onMessage != null) onMessage.on(message);
+        if (onMessage != null) onMessage.on(message);
     }
 
 //    @Override
@@ -135,7 +131,7 @@ public class MinesweeperClient extends WebSocketClient {
         ex.printStackTrace();
     }
 
-    public GameState getState() {
+    public ClientMessage getState() {
         return this.state;
     }
 }
