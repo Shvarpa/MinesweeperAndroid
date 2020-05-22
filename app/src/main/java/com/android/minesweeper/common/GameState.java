@@ -20,7 +20,7 @@ public class GameState {
     @SerializedName("columns")
     int columns;
     @SerializedName("won")
-    Boolean won = null;
+    Long won = null;
     @SerializedName("lost")
     Point lost = null;
     @SerializedName("bombs")
@@ -115,7 +115,11 @@ public class GameState {
     }
 
     public boolean getWon() {
-        return won != null && won;
+        return won != null;
+    }
+
+    public Long getWiningTime() {
+        return this.won;
     }
 
     public List<List<Cell>> getGrid() {

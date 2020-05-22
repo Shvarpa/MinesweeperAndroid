@@ -208,13 +208,15 @@ public class GameActivity extends AppCompatActivity {
                     }
                 });
                 highlights = state.highlights;
-                Point losingPoint = state.game.getLosingPoint();
-                if (state.game.getLost() && losingPoint != null) {
-                    state.game.get(losingPoint).lost = true;
+                if (state.game.getLost()) {
+                    Point losingPoint = state.game.getLosingPoint();
+                    if (losingPoint != null) state.game.get(losingPoint).lost = true;
                     Toast.makeText(GameActivity.this, "Lost", Toast.LENGTH_SHORT).show();
                 }
-                if (state.game.getWon())
-                    Toast.makeText(GameActivity.this, "Won", Toast.LENGTH_SHORT).show();
+                if (state.game.getWon()) {
+                    Long time = state.game.getWiningTime();
+                    Toast.makeText(GameActivity.this, "Won" + (time != null ? " in " + (Math.floor(time / 1e7) / 1e2) + " seconds!!" : ""), Toast.LENGTH_SHORT).show();
+                }
                 grid.update(state.game);
             }
         });

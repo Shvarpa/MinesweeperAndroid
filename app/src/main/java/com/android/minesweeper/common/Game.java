@@ -13,6 +13,7 @@ public class Game {
     Integer rows;
     Integer columns;
     int bombs;
+    long start;
 
     private void clear() {
         state = new GameState(rows, columns);
@@ -31,6 +32,7 @@ public class Game {
         clear();
         this.generateBombs(bombs, start);
         started = true;
+        this.start = System.nanoTime();
         return true;
     }
 
@@ -68,7 +70,7 @@ public class Game {
         }
         Log.e("TAG", "left: " + state.left);
         if (state.left == 0) {
-            state.won = true;
+            state.won = System.nanoTime() - start;
             revealAll();
         }
         return true;
