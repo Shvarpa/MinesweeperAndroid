@@ -1,4 +1,5 @@
 package com.android.minesweeper;
+
 import com.android.R;
 
 import androidx.appcompat.app.AppCompatActivity;
