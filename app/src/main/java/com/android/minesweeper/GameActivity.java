@@ -1,15 +1,16 @@
 package com.android.minesweeper;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.ColorUtils;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -49,7 +50,7 @@ public class GameActivity extends AppCompatActivity {
     static private final String CLIENT_TAG = "minesweeperclient";
 
     final int port = 4444;
-
+//    private Menu menu;
     TextView tvBombs, tvBombsRemaining, tvRemaining;
 
     private ClientCreator clientCreator = new ClientCreator() {
@@ -62,11 +63,29 @@ public class GameActivity extends AppCompatActivity {
         }
     };
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.close:
+                GameActivity.this.finishAffinity();
+                System.exit(0);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-
+        
         tvBombs = findViewById(R.id.bombs);
         tvBombsRemaining = findViewById(R.id.bombsRemaining);
         tvRemaining = findViewById(R.id.remaining);
